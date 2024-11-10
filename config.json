@@ -1,7 +1,0 @@
-{
-  "masterApiKey": "832cf9db09443e2d626b42bee5c4616b",
-  "serverPort": 3000,
-  "enableCustomBackend": true,
-  "customBackendPort": 4001,
-  "customBackendFile": "customBackend.js"
-}
