@@ -1,5 +1,9 @@
 {
   "port": 8080,
   "customBackend": "example.js",
-  "backendEnabled": true
+  "backendEnabled": true,
+  "proxy": {
+    "enabled": false,
+    "port": 8081
+  }
 }
