@@ -98,7 +98,7 @@ const ensureFolderExists = (folderPath, description) => {
     }
 };
 
-ensureFolderExists(path.join(__dirname, 'web roots'), 'Web roots');
+ensureFolderExists(path.join(__dirname, 'web_roots'), 'Web roots');
 ensureFolderExists(path.join(__dirname, 'db'), 'Database');
 ensureFolderExists(path.join(__dirname, 'metadata'), 'Metadata');
 ensureFolderExists(path.join(__dirname, 'logs'), 'Logs');
@@ -135,15 +135,20 @@ async function initialize() {
         const apiKey = req.headers['x-api-key'];
         const dbName = urlParts[2];
 
-        if (config.backendEnabled && config.customBackend) {
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Custom backend logic response');
-        } else {
-            logger.logMessage('Responding with Hive layer default response');
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Hive layer response');
+        // Handle the request to get data from a specific db (e.g., test1.js)
+        if (method === 'GET' && urlParts[1] === 'db') {
+            const dbFile = path.join(__dirname, 'db', `${dbName}.json`);
+            if (fs.existsSync(dbFile)) {
+                const dbContent = JSON.parse(fs.readFileSync(dbFile, 'utf8'));
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(dbContent));
+            } else {
+                res.writeHead(404);
+                res.end('Database not found');
+            }
         }
 
+        // Default response from Hive layer
         if (method === 'POST' && urlParts[1] === 'create') {
             if (apiKey !== masterKey) {
                 res.writeHead(403);
@@ -157,6 +162,10 @@ async function initialize() {
                 message: 'Database created successfully',
                 apiKey: newApiKey
             }));
+        } else {
+            logger.logMessage('Responding with Hive layer default response');
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end('Hive layer response');
         }
     });
 
@@ -174,7 +183,7 @@ async function initialize() {
 
     rl.on('line', (input) => {
         if (input.trim() === 'AKF') {
-            console.log('\n=== HiveDB Master Key Console ===');
+            console.log('\n=== Hive Console ===');
             console.log('1. Rotate Master Key');
             console.log('2. View Current Master Key');
             console.log('3. List All Databases and Their API Keys');
