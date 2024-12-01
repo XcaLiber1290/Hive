@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 // Load or create the master key
 function loadOrCreateMasterKey(keysFile, logFunction) {
@@ -20,9 +21,9 @@ function loadOrCreateMasterKey(keysFile, logFunction) {
     }
 }
 
-// Generate a random master key
+// Generate a random, long master key (64 characters)
 function generateMasterKey() {
-    return 'master-key-' + Math.random().toString(36).substring(2, 15);
+    return crypto.randomBytes(32).toString('hex');  // 64 characters (32 bytes * 2 characters per byte)
 }
 
 // Rotate the master key (this would overwrite the old one)
